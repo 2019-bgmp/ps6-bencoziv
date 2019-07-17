@@ -1,0 +1,49 @@
+#!/bin/bash
+
+#SBATCH --account=bgmp
+#SBATCH --partition=bgmp
+#SBATCH --job-name=ps6
+#SBATCH --output=slurm-%j-%x.out
+#SBATCH --nodes=1
+#SBATCH --time=0-06:00:00
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+
+fq_1=/projects/bgmp/shared/Bi621/800_3_PE5_interleaved.fq_1
+fq_2=/projects/bgmp/shared/Bi621/800_3_PE5_interleaved.fq_2
+fq_3=/projects/bgmp/shared/Bi621/800_3_PE5_interleaved.fq.unmatched
+
+usr/bin/time -v velveth gold31/ 31 -fastq  -shortPaired $fq_1 $fq_2 -short $fq_3
+usr/bin/time -v velvetg gold31/ -exp_cov 57.48
+usr/bin/time -v velveth gold41/ 41 -fastq  -shortPaired $fq_1 $fq_2 -short $fq_3
+usr/bin/time -v velvetg gold41/ -exp_cov 44.64
+usr/bin/time -v velveth gold49/ 49 -fastq  -shortPaired $fq_1 $fq_2 -short $fq_3
+usr/bin/time -v velvetg gold49/ -exp_cov 34.36
+
+usr/bin/time -v velveth gold49cov20/ 49 -fastq  -shortPaired $fq_1 $fq_2 -short $fq_3
+usr/bin/time -v velvetg gold49cov20/ -exp_cov 34.36 -cov_cutoff 20
+usr/bin/time -v velveth gold49cov60/ 49 -fastq  -shortPaired $fq_1 $fq_2 -short $fq_3
+usr/bin/time -v velvetg gold49cov60/ -exp_cov 34.36 -cov_cutoff 60
+usr/bin/time -v velveth gold49covA/ 49 -fastq  -shortPaired $fq_1 $fq_2 -short $fq_3
+usr/bin/time -v velvetg gold49covA/ -exp_cov 34.36 -cov_cutoff auto
+usr/bin/time -v velveth gold49minC/ 49 -fastq  -shortPaired $fq_1 $fq_2 -short $fq_3
+usr/bin/time -v velvetg gold49minC/ -exp_cov 34.36 -cov_cutoff auto -min_contig_lgth 500
+
+f1=gold31/contigs.fa
+f2=gold41/contigs.fa
+f3=gold49/contigs.fa
+f4=gold49cov60/contigs.fa
+f5=gold49cov20/contigs.fa
+f6=gold49covA/contigs.fa
+f7=gold49minC/contigs.fa
+
+./gen_qual.py -f $f1 > 31.txt
+./gen_qual.py -f $f2 > 41.txt
+./gen_qual.py -f $f3 > 49.txt
+./gen_qual.py -f $f4 > cov60.txt
+./gen_qual.py -f $f5 > cov20.txt
+./gen_qual.py -f $f6 > covA.txt
+./gen_qual.py -f $f7 > minC.txt
+
+mkdir results
+mv *.txt results

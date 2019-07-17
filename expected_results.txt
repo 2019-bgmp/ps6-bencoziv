@@ -1,0 +1,6 @@
+"assembly Length",180
+"Mean Contig", 90
+"max Contig",120
+"Number of Contigs", 2
+"Mean Depth", 560
+"N50", 120
